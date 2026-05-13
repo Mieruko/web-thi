@@ -187,6 +187,59 @@
       font-size: 18px;
     }
 
+    .pressure-setup {
+      grid-column: 1 / -1;
+    }
+
+    .mode-group {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .mode-option {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background: #ffffff;
+      padding: 12px;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    .mode-option.active {
+      border-color: #dc2626;
+      background: #fef2f2;
+      box-shadow: 0 8px 18px rgba(220, 38, 38, 0.1);
+    }
+
+    .mode-option input {
+      margin-top: 3px;
+    }
+
+    .mode-option strong,
+    .mode-option small {
+      display: block;
+    }
+
+    .mode-option small {
+      margin-top: 4px;
+      color: #64748b;
+      line-height: 1.45;
+    }
+
+    .pressure-summary {
+      border: 1px solid #fecaca;
+      background: #fff7ed;
+      color: #7f1d1d;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
     .status {
       display: inline-flex;
       align-items: center;
@@ -233,12 +286,56 @@
       font-weight: bold;
     }
 
+    .timer.urgent {
+      background: #dc2626;
+      border-color: #991b1b;
+      color: #ffffff;
+      animation: pulseTimer 0.9s ease-in-out infinite alternate;
+    }
+
+    @keyframes pulseTimer {
+      from {
+        transform: scale(1);
+      }
+      to {
+        transform: scale(1.03);
+      }
+    }
+
     .exam-controls {
       display: flex;
       gap: 10px;
       align-items: center;
       justify-content: flex-end;
       flex-wrap: wrap;
+    }
+
+    .pace-panel {
+      border: 1px solid #fecaca;
+      border-radius: 8px;
+      background: #fef2f2;
+      color: #7f1d1d;
+      padding: 9px 12px;
+      min-width: 260px;
+      max-width: 360px;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .pace-panel strong,
+    .pace-panel span {
+      display: block;
+    }
+
+    .pace-panel.warning {
+      border-color: #dc2626;
+      background: #fee2e2;
+    }
+
+    .pace-panel.locked {
+      border-color: #f97316;
+      background: #ffedd5;
+      color: #7c2d12;
     }
 
     .exam-controls .timer {
@@ -313,6 +410,21 @@
     .question.wrong {
       border-color: #ef4444;
       background: #fef2f2;
+    }
+
+    .question.locked {
+      opacity: 0.72;
+      border-color: #f97316;
+      background: #fff7ed;
+    }
+
+    .question.locked::before {
+      content: "Đã khóa do quá mốc thời gian";
+      display: block;
+      margin-bottom: 8px;
+      color: #9a3412;
+      font-size: 13px;
+      font-weight: bold;
     }
 
     .question h3 {
@@ -466,6 +578,7 @@
     @media (max-width: 860px) {
       .subject-grid,
       .history-grid,
+      .mode-group,
       .setup-grid,
       .exam-layout,
       .topbar {
@@ -482,8 +595,14 @@
       }
 
       .exam-controls button,
+      .exam-controls .pace-panel,
       .exam-controls .timer {
         flex: 1 1 160px;
+      }
+
+      .pace-panel {
+        max-width: none;
+        width: 100%;
       }
 
       .answer-card {
@@ -577,6 +696,32 @@
               <span id="jsonStatus" class="status">Chưa có JSON</span>
             </div>
           </div>
+
+          <div class="setup-box pressure-setup">
+            <div>
+              <h3>3. Chế độ làm bài</h3>
+              <p class="muted">Chọn cách tính giờ trước khi bắt đầu. Chế độ áp lực được thiết kế cho đề Toán 34 câu.</p>
+            </div>
+            <div class="mode-group">
+              <label id="normalModeOption" class="mode-option active">
+                <input type="radio" name="examMode" value="normal" checked onchange="setExamMode('normal')" />
+                <span>
+                  <strong>Bình thường</strong>
+                  <small>Dùng thời gian trong JSON. Nếu không có thì Toán mặc định 90 phút.</small>
+                </span>
+              </label>
+              <label id="pressureModeOption" class="mode-option">
+                <input type="radio" name="examMode" value="pressure" onchange="setExamMode('pressure')" />
+                <span>
+                  <strong>Áp lực cực đại</strong>
+                  <small>70 phút / 34 câu. Khóa câu 1-20 sau 35 phút để ép tốc độ.</small>
+                </span>
+              </label>
+            </div>
+            <div id="pressureModeNote" class="pressure-summary hidden">
+              Mục tiêu: câu 1-20 trong 35 phút, câu 21-34 trong 35 phút còn lại. Hệ thống sẽ cảnh báo khi chậm nhịp và tự nộp sau 70 phút.
+            </div>
+          </div>
         </div>
 
         <div class="guide">
@@ -601,6 +746,7 @@
             <p id="examMeta" class="muted">Đang làm bài.</p>
           </div>
           <div class="exam-controls">
+            <div id="pressurePace" class="pace-panel hidden"></div>
             <div id="timer" class="timer">--:--</div>
             <button id="submitBtn" class="success" type="button" onclick="submitExam()">Nộp bài</button>
             <button class="secondary" type="button" onclick="returnToSetup()">Về setup</button>
@@ -615,6 +761,7 @@
           <div class="result-item">Tổng điểm <strong id="totalScoreResult">0</strong></div>
           <div class="result-item">Số câu đúng hoàn toàn <strong id="correctResult">0</strong></div>
           <div class="result-item">Tổng số câu <strong id="totalQuestionResult">0</strong></div>
+          <div id="pressureResultItem" class="result-item hidden">Áp lực <strong id="pressureResult">0</strong></div>
         </div>
       </section>
 
@@ -648,10 +795,20 @@
       started: false,
       submitted: false,
       timerInterval: null,
-      timeLeftSeconds: 0
+      timeLeftSeconds: 0,
+      examMode: "normal",
+      pressureStartedAt: 0,
+      pressurePhaseLocked: false
     };
 
     const SCORE_HISTORY_KEY = "onlineExamScoreHistory";
+
+    const PRESSURE_MODE = {
+      totalMinutes: 70,
+      totalQuestions: 34,
+      phaseOneQuestions: 20,
+      phaseOneMinutes: 35
+    };
 
     const subjectLabels = {
       math: "Toán",
@@ -660,6 +817,7 @@
 
     document.getElementById("pdfFile").addEventListener("change", handlePdfImport);
     document.getElementById("jsonFile").addEventListener("change", handleJsonImport);
+    syncModeControls();
     renderScoreHistory();
 
     function selectSubject(subject) {
@@ -679,8 +837,12 @@
       clearTimer();
       state.started = false;
       state.submitted = false;
+      state.pressureStartedAt = 0;
+      state.pressurePhaseLocked = false;
       document.body.classList.remove("submitted");
       document.getElementById("result").classList.remove("show");
+      document.getElementById("pressurePace").classList.add("hidden");
+      document.getElementById("timer").classList.remove("urgent");
       showScreen("setupScreen");
       updateSetupView();
     }
@@ -705,11 +867,18 @@
       state.started = false;
       state.submitted = false;
       state.timeLeftSeconds = 0;
+      state.examMode = "normal";
+      state.pressureStartedAt = 0;
+      state.pressurePhaseLocked = false;
       document.body.classList.remove("submitted");
       document.getElementById("pdfFile").value = "";
       document.getElementById("jsonFile").value = "";
       document.getElementById("result").classList.remove("show");
+      document.getElementById("pressureResultItem").classList.add("hidden");
+      document.getElementById("pressurePace").classList.add("hidden");
+      document.getElementById("timer").classList.remove("urgent");
       document.getElementById("answerSheet").innerHTML = "";
+      syncModeControls();
     }
 
     function handlePdfImport(event) {
@@ -851,13 +1020,15 @@
     }
 
     function updateSetupView() {
+      syncModeControls();
       const subjectLabel = subjectLabels[state.subject] || "Chưa chọn môn";
       const questionCount = state.answerData ? state.answerData.questions.length : 0;
-      const duration = state.answerData ? state.answerData.duration || 0 : 0;
+      const duration = state.answerData ? getActiveDurationMinutes() : 0;
+      const modeText = isPressureMode() ? "Chế độ áp lực cực đại. " : "";
 
       document.getElementById("setupTitle").innerText = `Setup môn ${subjectLabel}`;
       document.getElementById("setupMeta").innerText = state.answerData
-        ? `${state.answerData.title}. Thời gian: ${duration || "không giới hạn"} phút. Số câu: ${questionCount}.`
+        ? `${state.answerData.title}. ${modeText}Thời gian: ${duration || "không giới hạn"} phút. Số câu: ${questionCount}.`
         : "Import PDF đề thi và JSON đáp án trước khi bắt đầu.";
 
       setStatus("pdfStatus", Boolean(state.pdfUrl), state.pdfName || "Đã có PDF", "Chưa có PDF");
@@ -883,16 +1054,69 @@
       element.classList.toggle("ready", ready);
     }
 
+    function setExamMode(mode) {
+      if (mode === "pressure" && state.subject !== "math") {
+        alert("Chế độ áp lực cực đại hiện chỉ áp dụng cho môn Toán.");
+        state.examMode = "normal";
+      } else {
+        state.examMode = mode === "pressure" ? "pressure" : "normal";
+      }
+
+      syncModeControls();
+      updateSetupView();
+    }
+
+    function syncModeControls() {
+      const normalRadio = document.querySelector('input[name="examMode"][value="normal"]');
+      const pressureRadio = document.querySelector('input[name="examMode"][value="pressure"]');
+      const normalOption = document.getElementById("normalModeOption");
+      const pressureOption = document.getElementById("pressureModeOption");
+      const pressureNote = document.getElementById("pressureModeNote");
+
+      if (state.subject !== "math" && state.examMode === "pressure") {
+        state.examMode = "normal";
+      }
+
+      if (normalRadio) normalRadio.checked = state.examMode === "normal";
+      if (pressureRadio) {
+        pressureRadio.checked = state.examMode === "pressure";
+        pressureRadio.disabled = state.subject !== "math";
+      }
+      if (normalOption) normalOption.classList.toggle("active", state.examMode === "normal");
+      if (pressureOption) {
+        pressureOption.classList.toggle("active", state.examMode === "pressure");
+        pressureOption.style.opacity = state.subject === "math" ? "1" : "0.55";
+      }
+      if (pressureNote) pressureNote.classList.toggle("hidden", !isPressureMode());
+    }
+
+    function isPressureMode() {
+      return state.examMode === "pressure" && state.subject === "math";
+    }
+
+    function getActiveDurationMinutes() {
+      if (isPressureMode()) return PRESSURE_MODE.totalMinutes;
+      return state.answerData ? state.answerData.duration || 0 : 0;
+    }
+
     function startExam() {
       if (!state.pdfUrl || !state.answerData) {
         alert("Bạn cần import cả PDF đề thi và JSON đáp án trước.");
         return;
       }
 
+      if (isPressureMode() && state.answerData.questions.length !== PRESSURE_MODE.totalQuestions) {
+        const confirmed = confirm(`Chế độ áp lực cực đại được thiết kế cho ${PRESSURE_MODE.totalQuestions} câu. File hiện có ${state.answerData.questions.length} câu. Vẫn bắt đầu với 70 phút?`);
+        if (!confirmed) return;
+      }
+
       state.started = true;
       state.submitted = false;
+      state.pressureStartedAt = isPressureMode() ? Date.now() : 0;
+      state.pressurePhaseLocked = false;
       document.body.classList.remove("submitted");
       document.getElementById("result").classList.remove("show");
+      document.getElementById("pressureResultItem").classList.add("hidden");
       document.getElementById("submitBtn").disabled = false;
 
       showScreen("examScreen");
@@ -900,7 +1124,8 @@
       renderAnswerSheet();
 
       document.getElementById("examPdfFrame").src = getPdfViewerUrl();
-      startTimer((state.answerData.duration || 0) * 60);
+      startTimer(getActiveDurationMinutes() * 60);
+      updatePressurePace();
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
@@ -917,9 +1142,12 @@
     function renderExamHeader() {
       const subjectLabel = subjectLabels[state.subject] || "";
       const title = state.answerData.title || `Đề thi ${subjectLabel}`;
-      const duration = state.answerData.duration || 0;
+      const duration = getActiveDurationMinutes();
+      const modeText = isPressureMode()
+        ? ` Chế độ áp lực cực đại: ${PRESSURE_MODE.totalMinutes} phút / ${PRESSURE_MODE.totalQuestions} câu, khóa câu 1-${PRESSURE_MODE.phaseOneQuestions} sau ${PRESSURE_MODE.phaseOneMinutes} phút.`
+        : "";
       document.getElementById("examTitle").innerText = title;
-      document.getElementById("examMeta").innerText = `Môn: ${subjectLabel}. Thời gian: ${duration || "không giới hạn"} phút. Số câu: ${state.answerData.questions.length}.`;
+      document.getElementById("examMeta").innerText = `Môn: ${subjectLabel}. Thời gian: ${duration || "không giới hạn"} phút. Số câu: ${state.answerData.questions.length}.${modeText}`;
     }
 
     function renderAnswerSheet() {
@@ -951,6 +1179,12 @@
       });
 
       answerSheet.innerHTML = html;
+      answerSheet.querySelectorAll("input").forEach((input) => {
+        input.addEventListener("change", updatePressurePace);
+      });
+      answerSheet.querySelectorAll(".short-input").forEach((input) => {
+        input.addEventListener("input", updatePressurePace);
+      });
     }
 
     function renderMultipleChoice(question) {
@@ -1086,6 +1320,7 @@
       document.getElementById("totalScoreResult").innerText = roundScore(totalScore);
       document.getElementById("correctResult").innerText = correctCount;
       document.getElementById("totalQuestionResult").innerText = state.answerData.questions.length;
+      renderPressureResult();
       document.getElementById("result").classList.add("show");
       saveScoreHistory({
         subject: state.subject,
@@ -1094,7 +1329,8 @@
         totalScore: roundScore(totalScore),
         correctCount,
         totalQuestions: state.answerData.questions.length,
-        duration: state.answerData.duration || 0,
+        duration: getActiveDurationMinutes(),
+        mode: state.examMode,
         submittedAt: submittedAt.toISOString()
       });
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1113,6 +1349,8 @@
       state.timerInterval = setInterval(() => {
         state.timeLeftSeconds--;
         updateTimerDisplay();
+        enforcePressurePhase();
+        updatePressurePace();
 
         if (state.timeLeftSeconds <= 0) {
           clearTimer();
@@ -1133,12 +1371,165 @@
       const timer = document.getElementById("timer");
       if (state.timeLeftSeconds <= 0) {
         timer.innerText = "00:00";
+        timer.classList.remove("urgent");
         return;
       }
 
       const minutes = Math.floor(state.timeLeftSeconds / 60);
       const seconds = state.timeLeftSeconds % 60;
       timer.innerText = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+      timer.classList.toggle("urgent", state.timeLeftSeconds <= 300 && state.started && !state.submitted);
+    }
+
+    function enforcePressurePhase() {
+      if (!isPressureMode() || !state.started || state.submitted || state.pressurePhaseLocked) return;
+
+      const phaseOneSeconds = PRESSURE_MODE.phaseOneMinutes * 60;
+      if (getPressureElapsedSeconds() < phaseOneSeconds) return;
+
+      lockPressurePhaseOne();
+      state.pressurePhaseLocked = true;
+      updatePressurePace();
+      alert(`Hết ${PRESSURE_MODE.phaseOneMinutes} phút phần I. Hệ thống đã khóa câu 1-${PRESSURE_MODE.phaseOneQuestions}.`);
+    }
+
+    function lockPressurePhaseOne() {
+      const limit = Math.min(PRESSURE_MODE.phaseOneQuestions, state.answerData.questions.length);
+      for (let index = 0; index < limit; index++) {
+        const question = state.answerData.questions[index];
+        const questionElement = document.getElementById(`question-${question.id}`);
+        if (!questionElement) continue;
+
+        questionElement.classList.add("locked");
+        questionElement.querySelectorAll("input").forEach((input) => {
+          input.disabled = true;
+        });
+      }
+    }
+
+    function updatePressurePace() {
+      const panel = document.getElementById("pressurePace");
+      if (!panel) return;
+
+      if (!isPressureMode() || !state.started || !state.answerData || state.submitted) {
+        panel.classList.add("hidden");
+        panel.classList.remove("warning", "locked");
+        return;
+      }
+
+      const elapsedSeconds = getPressureElapsedSeconds();
+      const phaseOneSeconds = PRESSURE_MODE.phaseOneMinutes * 60;
+      const totalQuestions = getPressureTotalQuestions();
+      const phaseOneQuestions = Math.min(PRESSURE_MODE.phaseOneQuestions, totalQuestions);
+      const inPhaseOne = elapsedSeconds < phaseOneSeconds && !state.pressurePhaseLocked;
+      const expectedQuestion = getExpectedPressureQuestion(elapsedSeconds);
+      const phaseOneAnswered = countAnsweredQuestions(phaseOneQuestions);
+      const totalAnswered = countAnsweredQuestions(totalQuestions);
+      const answeredForPace = inPhaseOne ? phaseOneAnswered : totalAnswered;
+      const expectedForPace = inPhaseOne ? Math.min(expectedQuestion, phaseOneQuestions) : expectedQuestion;
+      const lag = Math.max(0, expectedForPace - answeredForPace);
+      const warning = elapsedSeconds >= 300 && lag > 0;
+      const phaseRemaining = inPhaseOne
+        ? Math.max(0, phaseOneSeconds - elapsedSeconds)
+        : Math.max(0, state.timeLeftSeconds);
+      const phaseLabel = inPhaseOne ? "Phần I" : "Phần còn lại";
+      const targetLabel = inPhaseOne
+        ? `${phaseOneAnswered}/${phaseOneQuestions} câu phần I`
+        : `${totalAnswered}/${totalQuestions} câu`;
+
+      panel.classList.remove("hidden");
+      panel.classList.toggle("warning", warning);
+      panel.classList.toggle("locked", state.pressurePhaseLocked);
+      panel.innerHTML = `
+        <strong>Áp lực cực đại</strong>
+        <span>${phaseLabel} còn ${formatClockSeconds(phaseRemaining)} | Mục tiêu: tới câu ${expectedQuestion}/${totalQuestions}</span>
+        <span>Đã làm: ${targetLabel}${warning ? ` | Chậm ${lag} câu` : ""}</span>
+        ${state.pressurePhaseLocked ? `<span>Đã khóa câu 1-${phaseOneQuestions}</span>` : ""}
+      `;
+    }
+
+    function renderPressureResult() {
+      const item = document.getElementById("pressureResultItem");
+      const result = document.getElementById("pressureResult");
+      if (!item || !result) return;
+
+      if (!isPressureMode()) {
+        item.classList.add("hidden");
+        return;
+      }
+
+      const totalQuestions = getPressureTotalQuestions();
+      const phaseOneQuestions = Math.min(PRESSURE_MODE.phaseOneQuestions, totalQuestions);
+      const phaseOneAnswered = countAnsweredQuestions(phaseOneQuestions);
+      const totalAnswered = countAnsweredQuestions(totalQuestions);
+      const elapsedMinutes = Math.ceil(getPressureElapsedSeconds() / 60);
+      result.innerText = `${phaseOneAnswered}/${phaseOneQuestions} P1, ${totalAnswered}/${totalQuestions} câu, ${elapsedMinutes} phút`;
+      item.classList.remove("hidden");
+    }
+
+    function getPressureTotalQuestions() {
+      if (!state.answerData) return PRESSURE_MODE.totalQuestions;
+      return Math.min(PRESSURE_MODE.totalQuestions, state.answerData.questions.length);
+    }
+
+    function getPressureElapsedSeconds() {
+      const totalSeconds = PRESSURE_MODE.totalMinutes * 60;
+      if (state.timeLeftSeconds > 0) {
+        return Math.max(0, Math.min(totalSeconds, totalSeconds - state.timeLeftSeconds));
+      }
+
+      if (!state.pressureStartedAt) return 0;
+      return Math.max(0, Math.min(totalSeconds, Math.floor((Date.now() - state.pressureStartedAt) / 1000)));
+    }
+
+    function getExpectedPressureQuestion(elapsedSeconds) {
+      const totalQuestions = getPressureTotalQuestions();
+      const phaseOneQuestions = Math.min(PRESSURE_MODE.phaseOneQuestions, totalQuestions);
+      const phaseOneSeconds = PRESSURE_MODE.phaseOneMinutes * 60;
+      const totalSeconds = PRESSURE_MODE.totalMinutes * 60;
+
+      if (elapsedSeconds <= 0) return 0;
+      if (elapsedSeconds <= phaseOneSeconds) {
+        return Math.min(phaseOneQuestions, Math.ceil(elapsedSeconds / phaseOneSeconds * phaseOneQuestions));
+      }
+
+      const remainingQuestions = Math.max(0, totalQuestions - phaseOneQuestions);
+      const remainingSeconds = Math.max(1, totalSeconds - phaseOneSeconds);
+      const expectedAfterPhase = Math.ceil((elapsedSeconds - phaseOneSeconds) / remainingSeconds * remainingQuestions);
+      return Math.min(totalQuestions, phaseOneQuestions + expectedAfterPhase);
+    }
+
+    function countAnsweredQuestions(limit) {
+      if (!state.answerData) return 0;
+
+      return state.answerData.questions.slice(0, limit).filter(isQuestionAnswered).length;
+    }
+
+    function isQuestionAnswered(question) {
+      if (question.type === "multiple_choice") {
+        return Boolean(document.querySelector(`input[name="${cssEscape(question.id)}"]:checked`));
+      }
+
+      if (question.type === "true_false") {
+        const items = question.items || [];
+        return items.length > 0 && items.every((item) => {
+          return Boolean(document.querySelector(`input[name="${cssEscape(question.id)}-${cssEscape(item.key)}"]:checked`));
+        });
+      }
+
+      if (question.type === "short_answer") {
+        const input = document.getElementById(`input-${question.id}`);
+        return Boolean(input && input.value.trim());
+      }
+
+      return false;
+    }
+
+    function formatClockSeconds(value) {
+      const secondsValue = Math.max(0, Number(value || 0));
+      const minutes = Math.floor(secondsValue / 60);
+      const seconds = secondsValue % 60;
+      return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
     }
 
     function calculateTrueFalseScore(correctCount, totalItems, questionScore) {
@@ -1202,11 +1593,12 @@
       container.innerHTML = records.map((record) => {
         const submittedTime = formatDateTime(record.submittedAt);
         const durationText = record.duration ? `${record.duration} phút` : "Không giới hạn";
+        const modeText = record.mode === "pressure" ? " | Áp lực cực đại" : "";
         return `
           <div class="history-item">
             <strong>${escapeHtml(record.score)} / ${escapeHtml(record.totalScore)}</strong>
             <div>${escapeHtml(record.title || `Đề thi ${subjectLabels[subject]}`)}</div>
-            <div class="muted">${escapeHtml(submittedTime)} | ${escapeHtml(durationText)} | Đúng ${escapeHtml(record.correctCount)}/${escapeHtml(record.totalQuestions)} câu</div>
+            <div class="muted">${escapeHtml(submittedTime)} | ${escapeHtml(durationText)}${escapeHtml(modeText)} | Đúng ${escapeHtml(record.correctCount)}/${escapeHtml(record.totalQuestions)} câu</div>
           </div>
         `;
       }).join("");
