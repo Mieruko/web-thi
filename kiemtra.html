@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Web Thi Online</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      color: #111827;
+    }
+
+    header {
+      background: #14213d;
+      color: #ffffff;
+      padding: 18px 24px;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.2);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 23px;
+    }
+
+    header p {
+      margin: 6px 0 0;
+      color: #dbeafe;
+      font-size: 14px;
+    }
+
+    main {
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 24px 16px 80px;
+    }
+
+    .card {
+      background: #ffffff;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 8px 24px rgba(15, 23, 42, 0.07);
+      margin-bottom: 16px;
+    }
+
+    .screen.hidden,
+    .hidden {
+      display: none;
+    }
+
+    .screen-title {
+      margin: 0 0 8px;
+      font-size: 24px;
+    }
+
+    .muted {
+      color: #64748b;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .subject-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .subject-card {
+      text-align: left;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      padding: 22px;
+      background: #ffffff;
+      color: #111827;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    .subject-card:hover {
+      border-color: #2563eb;
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.14);
+      transform: translateY(-1px);
+    }
+
+    .subject-card strong {
+      display: block;
+      font-size: 23px;
+      margin-bottom: 8px;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    button,
+    .file-label {
+      border: none;
+      border-radius: 8px;
+      padding: 11px 14px;
+      background: #2563eb;
+      color: #ffffff;
+      cursor: pointer;
+      font-size: 14px;
+      transition: 0.18s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 42px;
+    }
+
+    button:hover,
+    .file-label:hover {
+      background: #1d4ed8;
+    }
+
+    button.secondary {
+      background: #475569;
+    }
+
+    button.secondary:hover {
+      background: #334155;
+    }
+
+    button.danger {
+      background: #dc2626;
+    }
+
+    button.danger:hover {
+      background: #b91c1c;
+    }
+
+    button.success {
+      background: #059669;
+    }
+
+    button.success:hover {
+      background: #047857;
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .setup-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+
+    .setup-box {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 16px;
+      background: #f9fafb;
+      min-height: 154px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .setup-box h3 {
+      margin: 0 0 6px;
+      font-size: 18px;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      border-radius: 999px;
+      padding: 5px 10px;
+      background: #fee2e2;
+      color: #991b1b;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .status.ready {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .guide {
+      background: #eef6ff;
+      border: 1px solid #bfdbfe;
+      color: #1e3a8a;
+      border-radius: 8px;
+      padding: 14px;
+      line-height: 1.65;
+      font-size: 14px;
+      margin-top: 16px;
+    }
+
+    code {
+      background: rgba(15, 23, 42, 0.08);
+      padding: 2px 5px;
+      border-radius: 5px;
+    }
+
+    .timer {
+      background: #fee2e2;
+      border: 1px solid #fecaca;
+      color: #991b1b;
+      border-radius: 8px;
+      padding: 12px 16px;
+      min-width: 142px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .exam-controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .exam-controls .timer {
+      flex: 0 0 auto;
+    }
+
+    .exam-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 400px);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .pdf-card {
+      padding: 16px;
+    }
+
+    .answer-card {
+      position: sticky;
+      top: 14px;
+      max-height: calc(100vh - 28px);
+      overflow: auto;
+    }
+
+    .panel-title {
+      margin: 0 0 12px;
+      font-size: 18px;
+    }
+
+    .pdf-frame {
+      width: 100%;
+      height: calc(100vh - 150px);
+      min-height: 680px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      background: #f8fafc;
+    }
+
+    .setup-pdf-frame {
+      height: min(74vh, 760px);
+      min-height: 520px;
+    }
+
+    .pdf-empty {
+      min-height: 260px;
+      border: 1px dashed #cbd5e1;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      color: #64748b;
+      text-align: center;
+      padding: 18px;
+    }
+
+    .answer-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .question {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 14px;
+      background: #ffffff;
+    }
+
+    .question.correct {
+      border-color: #10b981;
+      background: #ecfdf5;
+    }
+
+    .question.wrong {
+      border-color: #ef4444;
+      background: #fef2f2;
+    }
+
+    .question h3 {
+      margin: 0 0 10px;
+      font-size: 16px;
+      line-height: 1.45;
+    }
+
+    .score-tag {
+      display: inline-block;
+      margin-left: 6px;
+      color: #475569;
+      background: #f1f5f9;
+      border-radius: 999px;
+      padding: 3px 7px;
+      font-size: 12px;
+      font-weight: normal;
+    }
+
+    .options {
+      display: grid;
+      gap: 8px;
+    }
+
+    label.option {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      border: 1px solid #e5e7eb;
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 10px;
+      cursor: pointer;
+    }
+
+    .true-false-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 14px;
+    }
+
+    .true-false-table th,
+    .true-false-table td {
+      border: 1px solid #e5e7eb;
+      padding: 9px;
+      text-align: left;
+      vertical-align: top;
+    }
+
+    .true-false-table th {
+      background: #f8fafc;
+    }
+
+    .short-input {
+      width: 100%;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 11px;
+      font-size: 15px;
+    }
+
+    .answer-box {
+      display: none;
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 8px;
+      background: #f1f5f9;
+      color: #334155;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .submitted .answer-box {
+      display: block;
+    }
+
+    .result {
+      display: none;
+      border-left: 5px solid #059669;
+    }
+
+    .result.show {
+      display: block;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+    }
+
+    .result-item {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 13px;
+    }
+
+    .result-item strong {
+      display: block;
+      margin-top: 5px;
+      font-size: 22px;
+    }
+
+    .history-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .history-panel {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      background: #f8fafc;
+      padding: 14px;
+    }
+
+    .history-panel h3 {
+      margin: 0 0 10px;
+      font-size: 18px;
+    }
+
+    .history-list {
+      display: grid;
+      gap: 8px;
+      max-height: 260px;
+      overflow: auto;
+    }
+
+    .history-item {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      background: #ffffff;
+      padding: 10px;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .history-item strong {
+      font-size: 17px;
+    }
+
+    .history-empty {
+      color: #64748b;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 860px) {
+      .subject-grid,
+      .history-grid,
+      .setup-grid,
+      .exam-layout,
+      .topbar {
+        grid-template-columns: 1fr;
+      }
+
+      .timer {
+        width: 100%;
+      }
+
+      .exam-controls {
+        width: 100%;
+        justify-content: stretch;
+      }
+
+      .exam-controls button,
+      .exam-controls .timer {
+        flex: 1 1 160px;
+      }
+
+      .answer-card {
+        position: static;
+        max-height: none;
+      }
+
+      .pdf-frame {
+        height: 72vh;
+        min-height: 520px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Web Thi Online</h1>
+    <p>Chọn môn, import PDF đề thi và JSON đáp án, sau đó bấm bắt đầu để tính giờ.</p>
+  </header>
+
+  <main>
+    <section id="subjectScreen" class="screen">
+      <div class="card">
+        <h2 class="screen-title">Chọn môn thi</h2>
+        <p class="muted">Mở web sẽ dừng ở bước này. Sau khi chọn môn, bạn mới vào phần setup đề thi.</p>
+
+        <div class="subject-grid">
+          <button class="subject-card" type="button" onclick="selectSubject('math')">
+            <strong>Toán</strong>
+            <span>Import PDF đề Toán và JSON đáp án Toán.</span>
+          </button>
+          <button class="subject-card" type="button" onclick="selectSubject('english')">
+            <strong>Tiếng Anh</strong>
+            <span>Import PDF đề Tiếng Anh và JSON đáp án Tiếng Anh.</span>
+          </button>
+        </div>
+
+        <div class="history-grid">
+          <div class="history-panel">
+            <div class="topbar" style="margin-bottom: 10px;">
+              <h3>Lịch sử điểm Toán</h3>
+              <button class="secondary" type="button" onclick="clearScoreHistory('math')">Xóa</button>
+            </div>
+            <div id="mathHistory" class="history-list"></div>
+          </div>
+          <div class="history-panel">
+            <div class="topbar" style="margin-bottom: 10px;">
+              <h3>Lịch sử điểm Tiếng Anh</h3>
+              <button class="secondary" type="button" onclick="clearScoreHistory('english')">Xóa</button>
+            </div>
+            <div id="englishHistory" class="history-list"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="setupScreen" class="screen hidden">
+      <div class="card">
+        <div class="topbar">
+          <div>
+            <h2 id="setupTitle" class="screen-title">Setup đề thi</h2>
+            <p id="setupMeta" class="muted">Chưa có dữ liệu.</p>
+          </div>
+          <div class="actions">
+            <button class="secondary" type="button" onclick="backToSubject()">Đổi môn</button>
+            <button id="startBtn" class="success" type="button" onclick="startExam()" disabled>Bắt đầu thi</button>
+          </div>
+        </div>
+
+        <div class="setup-grid">
+          <div class="setup-box">
+            <div>
+              <h3>1. PDF đề thi</h3>
+              <p class="muted">PDF là đề gốc học sinh xem trong lúc làm bài.</p>
+            </div>
+            <div class="actions">
+              <label class="file-label" for="pdfFile">Import PDF</label>
+              <input id="pdfFile" type="file" accept="application/pdf,.pdf" />
+              <span id="pdfStatus" class="status">Chưa có PDF</span>
+            </div>
+          </div>
+
+          <div class="setup-box">
+            <div>
+              <h3>2. JSON đáp án</h3>
+              <p class="muted">JSON tạo phiếu trả lời, thời gian và đáp án để tự chấm.</p>
+            </div>
+            <div class="actions">
+              <label class="file-label" for="jsonFile">Import JSON</label>
+              <input id="jsonFile" type="file" accept="application/json,.json" />
+              <span id="jsonStatus" class="status">Chưa có JSON</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="guide">
+          JSON tối thiểu cần có <code>questions</code>. Có thể thêm <code>title</code>, <code>duration</code> theo phút và <code>subject</code>.
+          Mỗi câu hỗ trợ <code>multiple_choice</code>, <code>true_false</code>, <code>short_answer</code>.
+          Câu đúng/sai 4 ý được chấm: đúng 1 ý = 0,1; đúng 2 ý = 0,25; đúng 3 ý = 0,5; đúng 4 ý = 1 điểm.
+          Riêng môn Tiếng Anh dùng thời gian 60 phút.
+        </div>
+      </div>
+
+      <div id="setupPreview" class="card hidden">
+        <h3 class="panel-title">Xem trước PDF</h3>
+        <iframe id="setupPdfFrame" class="pdf-frame setup-pdf-frame" title="PDF đề thi"></iframe>
+      </div>
+    </section>
+
+    <section id="examScreen" class="screen hidden">
+      <div class="card">
+        <div class="topbar">
+          <div>
+            <h2 id="examTitle" class="screen-title">Đề thi</h2>
+            <p id="examMeta" class="muted">Đang làm bài.</p>
+          </div>
+          <div class="exam-controls">
+            <div id="timer" class="timer">--:--</div>
+            <button id="submitBtn" class="success" type="button" onclick="submitExam()">Nộp bài</button>
+            <button class="secondary" type="button" onclick="returnToSetup()">Về setup</button>
+          </div>
+        </div>
+      </div>
+
+      <section id="result" class="card result">
+        <h2 class="panel-title">Kết quả bài làm</h2>
+        <div class="result-grid">
+          <div class="result-item">Điểm đạt được <strong id="scoreResult">0</strong></div>
+          <div class="result-item">Tổng điểm <strong id="totalScoreResult">0</strong></div>
+          <div class="result-item">Số câu đúng hoàn toàn <strong id="correctResult">0</strong></div>
+          <div class="result-item">Tổng số câu <strong id="totalQuestionResult">0</strong></div>
+        </div>
+      </section>
+
+      <div class="exam-layout">
+        <section class="card pdf-card">
+          <div class="topbar" style="margin-bottom: 12px;">
+            <h3 class="panel-title" style="margin: 0;">PDF đề thi</h3>
+            <button class="secondary" type="button" onclick="openPdfInNewTab()">Mở PDF riêng</button>
+          </div>
+          <iframe id="examPdfFrame" class="pdf-frame" title="PDF đề thi"></iframe>
+        </section>
+
+        <section class="card answer-card">
+          <div class="topbar" style="margin-bottom: 12px;">
+            <h3 class="panel-title" style="margin: 0;">Phiếu trả lời</h3>
+          </div>
+          <div id="answerSheet" class="answer-list"></div>
+        </section>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const state = {
+      subject: "",
+      pdfUrl: "",
+      pdfObjectUrl: "",
+      pdfName: "",
+      answerData: null,
+      jsonName: "",
+      started: false,
+      submitted: false,
+      timerInterval: null,
+      timeLeftSeconds: 0
+    };
+
+    const SCORE_HISTORY_KEY = "onlineExamScoreHistory";
+
+    const subjectLabels = {
+      math: "Toán",
+      english: "Tiếng Anh"
+    };
+
+    document.getElementById("pdfFile").addEventListener("change", handlePdfImport);
+    document.getElementById("jsonFile").addEventListener("change", handleJsonImport);
+    renderScoreHistory();
+
+    function selectSubject(subject) {
+      resetSetup();
+      state.subject = subject;
+      showScreen("setupScreen");
+      updateSetupView();
+    }
+
+    function backToSubject() {
+      clearTimer();
+      resetSetup();
+      showScreen("subjectScreen");
+    }
+
+    function returnToSetup() {
+      clearTimer();
+      state.started = false;
+      state.submitted = false;
+      document.body.classList.remove("submitted");
+      document.getElementById("result").classList.remove("show");
+      showScreen("setupScreen");
+      updateSetupView();
+    }
+
+    function showScreen(screenId) {
+      ["subjectScreen", "setupScreen", "examScreen"].forEach((id) => {
+        document.getElementById(id).classList.toggle("hidden", id !== screenId);
+      });
+
+      if (screenId === "subjectScreen") {
+        renderScoreHistory();
+      }
+    }
+
+    function resetSetup() {
+      clearTimer();
+      revokePdfUrl();
+      state.pdfUrl = "";
+      state.pdfName = "";
+      state.answerData = null;
+      state.jsonName = "";
+      state.started = false;
+      state.submitted = false;
+      state.timeLeftSeconds = 0;
+      document.body.classList.remove("submitted");
+      document.getElementById("pdfFile").value = "";
+      document.getElementById("jsonFile").value = "";
+      document.getElementById("result").classList.remove("show");
+      document.getElementById("answerSheet").innerHTML = "";
+    }
+
+    function handlePdfImport(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      revokePdfUrl();
+      state.pdfUrl = URL.createObjectURL(file);
+      state.pdfObjectUrl = state.pdfUrl;
+      state.pdfName = file.name;
+      updateSetupView();
+    }
+
+    function handleJsonImport(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          state.answerData = normalizeAnswerData(parsed);
+          state.jsonName = file.name;
+          updateSetupView();
+        } catch (error) {
+          state.answerData = null;
+          state.jsonName = "";
+          updateSetupView();
+          alert("File JSON không hợp lệ hoặc thiếu questions.");
+          console.error(error);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function normalizeAnswerData(rawData) {
+      const data = Array.isArray(rawData) ? { questions: rawData } : rawData;
+      const rawQuestions = data.questions || data.answers;
+
+      if (!Array.isArray(rawQuestions) || rawQuestions.length === 0) {
+        throw new Error("JSON cần có mảng questions hoặc answers.");
+      }
+
+      return {
+        title: data.title || `Đề thi ${subjectLabels[state.subject] || ""}`.trim(),
+        subject: state.subject || data.subject || "",
+        duration: getExamDuration(data),
+        description: data.description || "",
+        questions: rawQuestions.map(normalizeQuestion)
+      };
+    }
+
+    function getExamDuration(data) {
+      const subject = state.subject || data.subject || "";
+      if (subject === "english") return 60;
+      if (data.duration !== undefined && data.duration !== null && data.duration !== "") {
+        return Number(data.duration || 0);
+      }
+      return 90;
+    }
+
+    function normalizeQuestion(rawQuestion, index) {
+      const type = rawQuestion.type || inferQuestionType(rawQuestion);
+      const id = rawQuestion.id || `q${index + 1}`;
+      const question = {
+        id,
+        type,
+        section: rawQuestion.section || "",
+        question: rawQuestion.question || rawQuestion.text || "",
+        options: rawQuestion.options || null,
+        score: getConfiguredScore(rawQuestion, type),
+        answer: rawQuestion.answer,
+        acceptedAnswers: rawQuestion.acceptedAnswers || rawQuestion.accepted || null,
+        explanation: rawQuestion.explanation || ""
+      };
+
+      if (type === "multiple_choice") {
+        question.answer = String(rawQuestion.answer || "").trim().toUpperCase();
+        question.options = rawQuestion.options || { A: "", B: "", C: "", D: "" };
+      }
+
+      if (type === "true_false") {
+        question.items = normalizeTrueFalseItems(rawQuestion);
+      }
+
+      if (type === "short_answer") {
+        question.answer = rawQuestion.answer ?? "";
+        question.acceptedAnswers = rawQuestion.acceptedAnswers || rawQuestion.accepted || [rawQuestion.answer ?? ""];
+      }
+
+      return question;
+    }
+
+    function inferQuestionType(rawQuestion) {
+      if (rawQuestion.items || isPlainObject(rawQuestion.answer)) return "true_false";
+      if (rawQuestion.options) return "multiple_choice";
+
+      const answer = String(rawQuestion.answer || "").trim();
+      if (/^[A-D]$/i.test(answer)) return "multiple_choice";
+      return "short_answer";
+    }
+
+    function getConfiguredScore(rawQuestion, type) {
+      if (rawQuestion.score !== undefined && rawQuestion.score !== null && rawQuestion.score !== "") {
+        return Number(rawQuestion.score || 0);
+      }
+
+      if (type === "true_false") return 1;
+      if (type === "multiple_choice") return 0.25;
+      if (type === "short_answer") return 0.5;
+      return 0;
+    }
+
+    function normalizeTrueFalseItems(rawQuestion) {
+      if (Array.isArray(rawQuestion.items)) {
+        return rawQuestion.items.map((item, index) => ({
+          key: item.key || String.fromCharCode(97 + index),
+          text: item.text || item.question || "",
+          answer: normalizeBooleanAnswer(item.answer)
+        }));
+      }
+
+      const answerObject = rawQuestion.answer || rawQuestion.answers || {};
+      return Object.entries(answerObject).map(([key, value]) => ({
+        key,
+        text: "",
+        answer: normalizeBooleanAnswer(value)
+      }));
+    }
+
+    function normalizeBooleanAnswer(value) {
+      if (typeof value === "boolean") return value;
+      const normalized = String(value || "").trim().toLowerCase();
+      return ["true", "t", "d", "đ", "dung", "đúng", "yes", "1"].includes(normalized);
+    }
+
+    function updateSetupView() {
+      const subjectLabel = subjectLabels[state.subject] || "Chưa chọn môn";
+      const questionCount = state.answerData ? state.answerData.questions.length : 0;
+      const duration = state.answerData ? state.answerData.duration || 0 : 0;
+
+      document.getElementById("setupTitle").innerText = `Setup môn ${subjectLabel}`;
+      document.getElementById("setupMeta").innerText = state.answerData
+        ? `${state.answerData.title}. Thời gian: ${duration || "không giới hạn"} phút. Số câu: ${questionCount}.`
+        : "Import PDF đề thi và JSON đáp án trước khi bắt đầu.";
+
+      setStatus("pdfStatus", Boolean(state.pdfUrl), state.pdfName || "Đã có PDF", "Chưa có PDF");
+      setStatus("jsonStatus", Boolean(state.answerData), state.jsonName || "Đã có JSON", "Chưa có JSON");
+
+      const canStart = Boolean(state.subject && state.pdfUrl && state.answerData);
+      document.getElementById("startBtn").disabled = !canStart;
+
+      const preview = document.getElementById("setupPreview");
+      const frame = document.getElementById("setupPdfFrame");
+      if (state.pdfUrl) {
+        frame.src = getPdfViewerUrl();
+        preview.classList.remove("hidden");
+      } else {
+        frame.removeAttribute("src");
+        preview.classList.add("hidden");
+      }
+    }
+
+    function setStatus(id, ready, readyText, emptyText) {
+      const element = document.getElementById(id);
+      element.innerText = ready ? readyText : emptyText;
+      element.classList.toggle("ready", ready);
+    }
+
+    function startExam() {
+      if (!state.pdfUrl || !state.answerData) {
+        alert("Bạn cần import cả PDF đề thi và JSON đáp án trước.");
+        return;
+      }
+
+      state.started = true;
+      state.submitted = false;
+      document.body.classList.remove("submitted");
+      document.getElementById("result").classList.remove("show");
+      document.getElementById("submitBtn").disabled = false;
+
+      showScreen("examScreen");
+      renderExamHeader();
+      renderAnswerSheet();
+
+      document.getElementById("examPdfFrame").src = getPdfViewerUrl();
+      startTimer((state.answerData.duration || 0) * 60);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function getPdfViewerUrl() {
+      if (!state.pdfUrl) return "";
+      return `${state.pdfUrl}#toolbar=0&navpanes=0&scrollbar=1&view=FitH&zoom=page-width`;
+    }
+
+    function openPdfInNewTab() {
+      if (!state.pdfUrl) return;
+      window.open(getPdfViewerUrl(), "_blank", "noopener");
+    }
+
+    function renderExamHeader() {
+      const subjectLabel = subjectLabels[state.subject] || "";
+      const title = state.answerData.title || `Đề thi ${subjectLabel}`;
+      const duration = state.answerData.duration || 0;
+      document.getElementById("examTitle").innerText = title;
+      document.getElementById("examMeta").innerText = `Môn: ${subjectLabel}. Thời gian: ${duration || "không giới hạn"} phút. Số câu: ${state.answerData.questions.length}.`;
+    }
+
+    function renderAnswerSheet() {
+      const answerSheet = document.getElementById("answerSheet");
+      let html = "";
+      let currentSection = "";
+
+      state.answerData.questions.forEach((question, index) => {
+        if (question.section && question.section !== currentSection) {
+          currentSection = question.section;
+          html += `<h3 class="panel-title">${escapeHtml(currentSection)}</h3>`;
+        }
+
+        html += `<div class="question" id="question-${escapeHtml(question.id)}">`;
+        html += `<h3>Câu ${index + 1}${question.question ? `. ${escapeHtml(question.question)}` : ""}<span class="score-tag">${roundScore(question.score)} điểm</span></h3>`;
+
+        if (question.type === "multiple_choice") {
+          html += renderMultipleChoice(question);
+        } else if (question.type === "true_false") {
+          html += renderTrueFalse(question);
+        } else if (question.type === "short_answer") {
+          html += renderShortAnswer(question);
+        } else {
+          html += `<p class="muted">Không hỗ trợ type: ${escapeHtml(question.type)}</p>`;
+        }
+
+        html += `<div class="answer-box" id="answer-${escapeHtml(question.id)}"></div>`;
+        html += "</div>";
+      });
+
+      answerSheet.innerHTML = html;
+    }
+
+    function renderMultipleChoice(question) {
+      let html = '<div class="options">';
+      Object.entries(question.options || { A: "", B: "", C: "", D: "" }).forEach(([key, value]) => {
+        const label = value ? `${key}. ${value}` : key;
+        html += `
+          <label class="option">
+            <input type="radio" name="${escapeHtml(question.id)}" value="${escapeHtml(key)}" />
+            <span>${escapeHtml(label)}</span>
+          </label>
+        `;
+      });
+      html += "</div>";
+      return html;
+    }
+
+    function renderTrueFalse(question) {
+      let html = `
+        <table class="true-false-table">
+          <thead>
+            <tr>
+              <th>Ý</th>
+              <th>Nội dung</th>
+              <th>Đúng</th>
+              <th>Sai</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      (question.items || []).forEach((item) => {
+        html += `
+          <tr>
+            <td><strong>${escapeHtml(item.key)}</strong></td>
+            <td>${escapeHtml(item.text || `Ý ${item.key}`)}</td>
+            <td><input type="radio" name="${escapeHtml(question.id)}-${escapeHtml(item.key)}" value="true" /></td>
+            <td><input type="radio" name="${escapeHtml(question.id)}-${escapeHtml(item.key)}" value="false" /></td>
+          </tr>
+        `;
+      });
+
+      html += "</tbody></table>";
+      return html;
+    }
+
+    function renderShortAnswer(question) {
+      return `<input class="short-input" type="text" id="input-${escapeHtml(question.id)}" placeholder="Nhập đáp án..." />`;
+    }
+
+    function submitExam() {
+      if (!state.started || !state.answerData || state.submitted) return;
+
+      const confirmSubmit = confirm("Bạn chắc chắn muốn nộp bài?");
+      if (!confirmSubmit) return;
+
+      gradeExam();
+    }
+
+    function forceSubmitExam() {
+      if (!state.started || state.submitted) return;
+      gradeExam();
+    }
+
+    function gradeExam() {
+      state.submitted = true;
+      document.body.classList.add("submitted");
+      document.getElementById("submitBtn").disabled = true;
+      clearTimer();
+
+      let totalScore = 0;
+      let userScore = 0;
+      let correctCount = 0;
+      const submittedAt = new Date();
+
+      state.answerData.questions.forEach((question) => {
+        const questionElement = document.getElementById(`question-${question.id}`);
+        const answerElement = document.getElementById(`answer-${question.id}`);
+        const questionScore = Number(question.score || 0);
+        totalScore += questionScore;
+
+        let earned = 0;
+        let isCorrect = false;
+        let answerHtml = "";
+
+        if (question.type === "multiple_choice") {
+          const selected = document.querySelector(`input[name="${cssEscape(question.id)}"]:checked`);
+          const userAnswer = selected ? selected.value : "Chưa chọn";
+          isCorrect = userAnswer === question.answer;
+          earned = isCorrect ? questionScore : 0;
+          answerHtml = `<strong>Đáp án của bạn:</strong> ${escapeHtml(userAnswer)}<br><strong>Đáp án đúng:</strong> ${escapeHtml(question.answer)}`;
+        }
+
+        if (question.type === "true_false") {
+          let itemCorrect = 0;
+          const details = [];
+
+          question.items.forEach((item) => {
+            const selected = document.querySelector(`input[name="${cssEscape(question.id)}-${cssEscape(item.key)}"]:checked`);
+            const userAnswer = selected ? selected.value === "true" : null;
+            const ok = userAnswer === item.answer;
+            if (ok) itemCorrect++;
+            details.push(`${escapeHtml(item.key)}) Bạn chọn: ${userAnswer === null ? "Chưa chọn" : userAnswer ? "Đúng" : "Sai"} | Đáp án: ${item.answer ? "Đúng" : "Sai"}`);
+          });
+
+          earned = calculateTrueFalseScore(itemCorrect, question.items.length, questionScore);
+          isCorrect = itemCorrect === question.items.length;
+          answerHtml = `<strong>Kết quả:</strong> Đúng ${itemCorrect}/${question.items.length} ý<br>${details.join("<br>")}<br><strong>Cách chấm:</strong> ${getTrueFalseScoringText(question.items.length)}`;
+        }
+
+        if (question.type === "short_answer") {
+          const input = document.getElementById(`input-${question.id}`);
+          const rawUserAnswer = input ? input.value : "";
+          const userAnswer = normalizeTextAnswer(rawUserAnswer);
+          const accepted = (question.acceptedAnswers || [question.answer]).map(normalizeTextAnswer);
+          isCorrect = accepted.includes(userAnswer);
+          earned = isCorrect ? questionScore : 0;
+          answerHtml = `<strong>Đáp án của bạn:</strong> ${escapeHtml(rawUserAnswer || "Chưa nhập")}<br><strong>Đáp án đúng:</strong> ${escapeHtml(question.answer)}`;
+        }
+
+        if (question.explanation) {
+          answerHtml += `<br><strong>Giải thích:</strong> ${escapeHtml(question.explanation)}`;
+        }
+
+        userScore += earned;
+        if (isCorrect) correctCount++;
+
+        questionElement.classList.add(isCorrect ? "correct" : "wrong");
+        answerElement.innerHTML = `${answerHtml}<br><strong>Điểm câu này:</strong> ${roundScore(earned)} / ${roundScore(questionScore)}`;
+      });
+
+      document.getElementById("scoreResult").innerText = roundScore(userScore);
+      document.getElementById("totalScoreResult").innerText = roundScore(totalScore);
+      document.getElementById("correctResult").innerText = correctCount;
+      document.getElementById("totalQuestionResult").innerText = state.answerData.questions.length;
+      document.getElementById("result").classList.add("show");
+      saveScoreHistory({
+        subject: state.subject,
+        title: state.answerData.title,
+        score: roundScore(userScore),
+        totalScore: roundScore(totalScore),
+        correctCount,
+        totalQuestions: state.answerData.questions.length,
+        duration: state.answerData.duration || 0,
+        submittedAt: submittedAt.toISOString()
+      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function startTimer(seconds) {
+      clearTimer();
+      state.timeLeftSeconds = seconds;
+      updateTimerDisplay();
+
+      if (seconds <= 0) {
+        document.getElementById("timer").innerText = "Không giới hạn";
+        return;
+      }
+
+      state.timerInterval = setInterval(() => {
+        state.timeLeftSeconds--;
+        updateTimerDisplay();
+
+        if (state.timeLeftSeconds <= 0) {
+          clearTimer();
+          alert("Hết giờ. Hệ thống tự động nộp bài.");
+          forceSubmitExam();
+        }
+      }, 1000);
+    }
+
+    function clearTimer() {
+      if (state.timerInterval) {
+        clearInterval(state.timerInterval);
+        state.timerInterval = null;
+      }
+    }
+
+    function updateTimerDisplay() {
+      const timer = document.getElementById("timer");
+      if (state.timeLeftSeconds <= 0) {
+        timer.innerText = "00:00";
+        return;
+      }
+
+      const minutes = Math.floor(state.timeLeftSeconds / 60);
+      const seconds = state.timeLeftSeconds % 60;
+      timer.innerText = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    }
+
+    function calculateTrueFalseScore(correctCount, totalItems, questionScore) {
+      if (totalItems === 4) {
+        const rubric = {
+          0: 0,
+          1: 0.1,
+          2: 0.25,
+          3: 0.5,
+          4: 1
+        };
+        return Number(questionScore || 0) * rubric[correctCount];
+      }
+
+      return totalItems > 0 ? Number(questionScore || 0) * correctCount / totalItems : 0;
+    }
+
+    function getTrueFalseScoringText(totalItems) {
+      if (totalItems === 4) {
+        return "1 ý đúng = 0,1; 2 ý = 0,25; 3 ý = 0,5; 4 ý = 1 điểm.";
+      }
+
+      return "Điểm được chia đều theo số ý đúng.";
+    }
+
+    function getScoreHistory() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(SCORE_HISTORY_KEY) || "{}");
+        return {
+          math: Array.isArray(parsed.math) ? parsed.math : [],
+          english: Array.isArray(parsed.english) ? parsed.english : []
+        };
+      } catch (error) {
+        return { math: [], english: [] };
+      }
+    }
+
+    function saveScoreHistory(record) {
+      const subject = record.subject === "english" ? "english" : "math";
+      const history = getScoreHistory();
+      history[subject] = [record, ...history[subject]].slice(0, 20);
+      localStorage.setItem(SCORE_HISTORY_KEY, JSON.stringify(history));
+      renderScoreHistory();
+    }
+
+    function renderScoreHistory() {
+      const history = getScoreHistory();
+      renderSubjectHistory("math", history.math);
+      renderSubjectHistory("english", history.english);
+    }
+
+    function renderSubjectHistory(subject, records) {
+      const container = document.getElementById(`${subject}History`);
+      if (!container) return;
+
+      if (!records.length) {
+        container.innerHTML = `<div class="history-empty">Chưa có lịch sử điểm ${escapeHtml(subjectLabels[subject])}.</div>`;
+        return;
+      }
+
+      container.innerHTML = records.map((record) => {
+        const submittedTime = formatDateTime(record.submittedAt);
+        const durationText = record.duration ? `${record.duration} phút` : "Không giới hạn";
+        return `
+          <div class="history-item">
+            <strong>${escapeHtml(record.score)} / ${escapeHtml(record.totalScore)}</strong>
+            <div>${escapeHtml(record.title || `Đề thi ${subjectLabels[subject]}`)}</div>
+            <div class="muted">${escapeHtml(submittedTime)} | ${escapeHtml(durationText)} | Đúng ${escapeHtml(record.correctCount)}/${escapeHtml(record.totalQuestions)} câu</div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function clearScoreHistory(subject) {
+      const subjectLabel = subjectLabels[subject] || "môn này";
+      const confirmed = confirm(`Xóa toàn bộ lịch sử điểm ${subjectLabel}?`);
+      if (!confirmed) return;
+
+      const history = getScoreHistory();
+      history[subject] = [];
+      localStorage.setItem(SCORE_HISTORY_KEY, JSON.stringify(history));
+      renderScoreHistory();
+    }
+
+    function formatDateTime(value) {
+      if (!value) return "";
+      return new Intl.DateTimeFormat("vi-VN", {
+        hour: "2-digit",
+        minute: "2-digit",
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric"
+      }).format(new Date(value));
+    }
+
+    function normalizeTextAnswer(value) {
+      return String(value || "")
+        .trim()
+        .toLowerCase()
+        .replace(/\s+/g, "")
+        .replace(/,/g, ".");
+    }
+
+    function isPlainObject(value) {
+      return value !== null && typeof value === "object" && !Array.isArray(value);
+    }
+
+    function revokePdfUrl() {
+      if (state.pdfObjectUrl) {
+        URL.revokeObjectURL(state.pdfObjectUrl);
+        state.pdfObjectUrl = "";
+      }
+    }
+
+    function cssEscape(value) {
+      return String(value)
+        .replace(/\\/g, "\\\\")
+        .replace(/"/g, '\\"');
+    }
+
+    function roundScore(value) {
+      return Math.round(Number(value || 0) * 100) / 100;
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  </script>
+</body>
+</html>
