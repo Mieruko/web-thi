@@ -780,7 +780,7 @@
         section: rawQuestion.section || "",
         question: rawQuestion.question || rawQuestion.text || "",
         options: rawQuestion.options || null,
-        score: getConfiguredScore(rawQuestion, type),
+        score: getConfiguredScore(rawQuestion, type, index + 1),
         answer: rawQuestion.answer,
         acceptedAnswers: rawQuestion.acceptedAnswers || rawQuestion.accepted || null,
         explanation: rawQuestion.explanation || ""
@@ -812,7 +812,11 @@
       return "short_answer";
     }
 
-    function getConfiguredScore(rawQuestion, type) {
+    function getConfiguredScore(rawQuestion, type, questionNumber) {
+      if (state.subject === "math" && questionNumber >= 29 && questionNumber <= 34) {
+        return 0.25;
+      }
+
       if (rawQuestion.score !== undefined && rawQuestion.score !== null && rawQuestion.score !== "") {
         return Number(rawQuestion.score || 0);
       }
